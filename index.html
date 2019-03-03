@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+    <title>ML Risk Check Training</title>
+
+    <style>
+      h1,
+      h2,
+      h3,
+      h4 {
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main role="main">
+      <div class="jumbotron">
+        <h1>Crash Risk Calculator: Training</h1>
+        <h4>Train a Machine Learning Model from existing data to predict risk of accidents</h4>
+        <h4><em>After</em> you have trained the model use the <a href='calculator.html' target="_blank">Risk Calculator</a> 
+            to test your model on data of prospective customers</h4>
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <h2>Data</h2>
+            <div id="scatter-surface"></div>
+          </div>
+        </div>
+          <div class="row">
+                <div class="col-12">
+                    <h2>Model</h2>
+            <div id="model-surface"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <h2>Training Metrics</h2>
+            <div id="metrics-surface"></div>
+          </div>
+          <div class="col-6">
+            <h2>Training Results</h2>
+            <h3>Accuracy at End of Training</h3>
+            <h4 id="summary"></h4>
+            <h3>Confusion Matrix</h3>
+            <div id="matrix-surface"></div>
+            <h3>Accuracy per Categorie</h3>
+            <div id="accuracy-surface"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="lib/tf.js"></script>
+    <script src="lib/tfjs-vis.min.js"></script>
+    <script src="lib/d3.js"></script>
+    <script type="module" src="train.js"></script>
+  </body>
+</html>
