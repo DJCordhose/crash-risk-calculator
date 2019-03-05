@@ -86,7 +86,7 @@ height: 500
   const history = await model.fit(X, y, {
     epochs: 50, // was 500, down to 50 to make this train quickly
     validationSplit: 0.2,
-    batchSize: 100, // was 500, down to 100 to try on mobile
+    batchSize: 500, // was 500, down to 100 to try on mobile
     callbacks: vizCallbacks
     // callbacks: consoleCallbacks
   });
