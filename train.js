@@ -8,12 +8,12 @@ const DATA_URL =
   // step 1: load, plot and pre-process data
 
   // https://js.tensorflow.org/api/latest/#data.csv
-const csvDataset = await tf.data.csv(DATA_URL, {
-  delimiter: ";",
-  columnConfigs: {
-    group: { isLabel: true }
-  }
-});
+  const csvDataset = await tf.data.csv(DATA_URL, {
+    delimiter: ";",
+    columnConfigs: {
+      group: { isLabel: true }
+    }
+  });
 
   // https://js.tensorflow.org/api/latest/#class:data.CSVDataset
   const columnNames = await csvDataset.columnNames();
@@ -53,34 +53,42 @@ const csvDataset = await tf.data.csv(DATA_URL, {
       fontSize: 18,
       zoomToFit: true,
       height: 400,
-      yAxisDomain: [80, 180], 
-      xAxisDomain: [15, 110] 
+      yAxisDomain: [80, 180],
+      xAxisDomain: [15, 110]
     }
   );
 
   // step 2: define a simple sequential model
   // https://js.tensorflow.org/api/latest/#layers.dropout
-  // https://js.tensorflow.org/api/latest/#layers.batchNormalization    
+  // https://js.tensorflow.org/api/latest/#layers.batchNormalization
 
-  const DROP_OUT = 0.75
+  const DROP_OUT = 0.7;
+  const REGULARIZE = true;
   const model = tf.sequential();
   model.add(
     tf.layers.dense({
       name: "hidden1",
       units: 100,
-      // activation: "relu",
       inputShape: [3]
     })
   );
-  model.add(tf.layers.dropout({rate: DROP_OUT}));
-  model.add(tf.layers.batchNormalization());
-  model.add(tf.layers.activation({activation: 'relu'}));
-  model.add(
-    tf.layers.dense({ name: "hidden2", units: 100 })
-  );
-  model.add(tf.layers.dropout({rate: DROP_OUT}));
-  model.add(tf.layers.batchNormalization());
-  model.add(tf.layers.activation({activation: 'relu'}));
+  if (REGULARIZE) {
+    model.add(tf.layers.batchNormalization());
+  }
+  model.add(tf.layers.activation({ activation: "relu" }));
+  if (REGULARIZE) {
+    model.add(tf.layers.dropout({ rate: DROP_OUT }));
+  }
+
+  model.add(tf.layers.dense({ name: "hidden2", units: 100 }));
+  if (REGULARIZE) {
+    model.add(tf.layers.batchNormalization());
+  }
+  model.add(tf.layers.activation({ activation: "relu" }));
+  if (REGULARIZE) {
+    model.add(tf.layers.dropout({ rate: DROP_OUT }));
+  }
+
   model.add(
     tf.layers.dense({ name: "softmax", units: 3, activation: "softmax" })
   );
@@ -103,19 +111,19 @@ const csvDataset = await tf.data.csv(DATA_URL, {
 
   // this is broken, prefetch should deliver all values, but only delivers up tp 1000
   const xs = await csvDataset
-  .prefetch(DATA_SIZE)
-  .map(({ xs, _ }) => Object.values(xs))
-  .toArray();
+    .prefetch(DATA_SIZE)
+    .map(({ xs, _ }) => Object.values(xs))
+    .toArray();
 
   const ys = await csvDataset
-  .prefetch(DATA_SIZE)
-  .map(({ _, ys }) => Object.values(ys)[0])
-  .toArray();
+    .prefetch(DATA_SIZE)
+    .map(({ _, ys }) => Object.values(ys)[0])
+    .toArray();
 
   const X = tf.tensor2d(xs, [xs.length, 3]);
   // const y = tf.oneHot(tf.tensor1d(ys, 'int32'), 3);
   // one hot not needed when using sparse categorical crossentropy as loss
-  const y = tf.tensor1d(ys, 'int32')
+  const y = tf.tensor1d(ys, "int32");
 
   const surfaceContainer = document.getElementById("metrics-surface");
   const metrics = ["loss", "val_loss", "acc", "val_acc"];
@@ -173,9 +181,18 @@ const csvDataset = await tf.data.csv(DATA_URL, {
   tfvis.show.perClassAccuracy(accuracyContainer, classAccuracy, classNames);
 
   // https://js.tensorflow.org/api_vis/latest/#show.layer
-  tfvis.show.layer(document.getElementById("hidden1-layer-surface"), model.getLayer('hidden1'));
-  tfvis.show.layer(document.getElementById("hidden2-layer-surface"), model.getLayer('hidden2'));
-  tfvis.show.layer(document.getElementById("softmax-layer-surface"), model.getLayer('softmax'));
+  tfvis.show.layer(
+    document.getElementById("hidden1-layer-surface"),
+    model.getLayer("hidden1")
+  );
+  tfvis.show.layer(
+    document.getElementById("hidden2-layer-surface"),
+    model.getLayer("hidden2")
+  );
+  tfvis.show.layer(
+    document.getElementById("softmax-layer-surface"),
+    model.getLayer("softmax")
+  );
 
   // step 5: safe to local browser storage
   // https://js.tensorflow.org/tutorials/model-save-load.html
