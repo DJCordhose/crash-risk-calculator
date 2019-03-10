@@ -8,12 +8,12 @@ const DATA_URL =
   // step 1: load, plot and pre-process data
 
   // https://js.tensorflow.org/api/latest/#data.csv
-  const csvDataset = await tf.data.csv(DATA_URL, {
-    delimiter: ";",
-    columnConfigs: {
-      group: { isLabel: true }
-    }
-  });
+const csvDataset = await tf.data.csv(DATA_URL, {
+  delimiter: ";",
+  columnConfigs: {
+    group: { isLabel: true }
+  }
+});
 
   // https://js.tensorflow.org/api/latest/#class:data.CSVDataset
   const columnNames = await csvDataset.columnNames();
@@ -26,8 +26,7 @@ const DATA_URL =
   const [red, green, yellow] = [0, 1, 2];
 
   // https://github.com/tensorflow/tfjs-vis
-  // https://storage.googleapis.com/tfjs-vis/mnist/dist/index.html
-  // https://github.com/tensorflow/tfjs-vis#renderscatterplotdata--container-surfacehtmlelement-opts---promise
+  // https://js.tensorflow.org/api_vis/latest/#render.scatterplot
 
   const valuesAgeSpeedRed = await csvDataset
     .filter(({ xs, ys }) => Number(ys.group) === red)
@@ -51,9 +50,11 @@ const DATA_URL =
     {
       xLabel: "Age",
       yLabel: "Speed",
-      fontSize: 24,
+      fontSize: 18,
       zoomToFit: true,
-      height: 500
+      height: 400,
+      yAxisDomain: [80, 180], 
+      xAxisDomain: [15, 110] 
     }
   );
 
@@ -70,13 +71,13 @@ const DATA_URL =
       inputShape: [3]
     })
   );
-  model.add(tf.layers.dropout(rate=0.6));
+  model.add(tf.layers.dropout({rate: 0.6}));
   model.add(tf.layers.batchNormalization());
   model.add(tf.layers.activation({activation: 'relu'}));
   model.add(
     tf.layers.dense({ name: "hidden2", units: 100 })
   );
-  model.add(tf.layers.dropout(rate=0.6));
+  model.add(tf.layers.dropout({rate: 0.6}));
   model.add(tf.layers.batchNormalization());
   model.add(tf.layers.activation({activation: 'relu'}));
   model.add(
