@@ -75,7 +75,7 @@ const DATA_URL =
   );
   model.summary();
 
-  // https://github.com/tensorflow/tfjs-vis#showmodelsummarycontainer-drawable-model-tfmodel--promise
+  // https://js.tensorflow.org/api_vis/latest/#show.modelSummary
   const modelContainer = document.getElementById("model-surface");
   tfvis.show.modelSummary(modelContainer, model);
 
@@ -129,8 +129,6 @@ const DATA_URL =
     // callbacks: consoleCallbacks
   });
 
-  return;
-
   // tfvis.show.history(surfaceContainer, history, ['loss', 'val_loss', 'acc', 'val_acc'],
   // {
   //   width: 1000,
@@ -152,7 +150,7 @@ const DATA_URL =
   // 1 - green: few or no accidents
   // 2 - yellow: in the middle
   const classNames = ["many accidents", "few or no accidents", "in the middle"];
-  const labels = tf.tensor(groups);
+  const labels = tf.tensor(ys);
   const preds = model.predict(X).argMax([-1]);
 
   const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds);
@@ -162,6 +160,11 @@ const DATA_URL =
   const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds);
   const accuracyContainer = document.getElementById("accuracy-surface");
   tfvis.show.perClassAccuracy(accuracyContainer, classAccuracy, classNames);
+
+  // https://js.tensorflow.org/api_vis/latest/#show.layer
+  tfvis.show.layer(document.getElementById("hidden1-layer-surface"), model.getLayer('hidden1'));
+  tfvis.show.layer(document.getElementById("hidden2-layer-surface"), model.getLayer('hidden2'));
+  tfvis.show.layer(document.getElementById("softmax-layer-surface"), model.getLayer('softmax'));
 
   // step 5: safe to local browser storage
   // https://js.tensorflow.org/tutorials/model-save-load.html

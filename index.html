@@ -26,9 +26,15 @@
     <main role="main">
       <div class="jumbotron">
         <h1>Crash Risk Calculator: Training</h1>
-        <h4>Train a Machine Learning Model from existing data to predict risk of accidents</h4>
-        <h4><em>After</em> you have trained the model use the <a href='calculator.html' target="_blank">Risk Calculator</a> 
-            to test your model on data of prospective customers</h4>
+        <h4>
+          Train a Machine Learning Model from existing data to predict risk of
+          accidents
+        </h4>
+        <h4>
+          <em>After</em> you have trained the model use the
+          <a href="calculator.html" target="_blank">Risk Calculator</a> to test
+          your model on data of prospective customers
+        </h4>
       </div>
       <div class="container">
         <div class="row">
@@ -37,9 +43,9 @@
             <div id="scatter-surface"></div>
           </div>
         </div>
-          <div class="row">
-                <div class="col-12">
-                    <h2>Model</h2>
+        <div class="row">
+          <div class="col-12">
+            <h2>Model</h2>
             <div id="model-surface"></div>
           </div>
         </div>
@@ -58,11 +64,29 @@
             <div id="accuracy-surface"></div>
           </div>
         </div>
+        <div class="row">
+          <div class="col-12">
+            <h2>Hidden Layer #1</h2>
+            <div id="hidden1-layer-surface"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <h2>Hidden Layer #2</h2>
+            <div id="hidden2-layer-surface"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <h2>Softmax Layer</h2>
+            <div id="softmax-layer-surface"></div>
+          </div>
+        </div>
       </div>
     </main>
     <script src="lib/tf.js"></script>
     <script>
-    console.log(tf.version);
+      console.log(tf.version);
     </script>
     <script src="lib/tfjs-vis.min.js"></script>
     <script type="module" src="train.js"></script>
