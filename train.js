@@ -58,18 +58,27 @@ const DATA_URL =
   );
 
   // step 2: define a simple sequential model
+  // https://js.tensorflow.org/api/latest/#layers.dropout
+  // https://js.tensorflow.org/api/latest/#layers.batchNormalization    
+
   const model = tf.sequential();
   model.add(
     tf.layers.dense({
       name: "hidden1",
       units: 100,
-      activation: "relu",
+      // activation: "relu",
       inputShape: [3]
     })
   );
+  model.add(tf.layers.dropout(rate=0.6));
+  model.add(tf.layers.batchNormalization());
+  model.add(tf.layers.activation({activation: 'relu'}));
   model.add(
-    tf.layers.dense({ name: "hidden2", units: 100, activation: "relu" })
+    tf.layers.dense({ name: "hidden2", units: 100 })
   );
+  model.add(tf.layers.dropout(rate=0.6));
+  model.add(tf.layers.batchNormalization());
+  model.add(tf.layers.activation({activation: 'relu'}));
   model.add(
     tf.layers.dense({ name: "softmax", units: 3, activation: "softmax" })
   );
