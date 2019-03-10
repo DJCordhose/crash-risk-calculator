@@ -62,6 +62,7 @@ const csvDataset = await tf.data.csv(DATA_URL, {
   // https://js.tensorflow.org/api/latest/#layers.dropout
   // https://js.tensorflow.org/api/latest/#layers.batchNormalization    
 
+  const DROP_OUT = 0.75
   const model = tf.sequential();
   model.add(
     tf.layers.dense({
@@ -71,13 +72,13 @@ const csvDataset = await tf.data.csv(DATA_URL, {
       inputShape: [3]
     })
   );
-  model.add(tf.layers.dropout({rate: 0.6}));
+  model.add(tf.layers.dropout({rate: DROP_OUT}));
   model.add(tf.layers.batchNormalization());
   model.add(tf.layers.activation({activation: 'relu'}));
   model.add(
     tf.layers.dense({ name: "hidden2", units: 100 })
   );
-  model.add(tf.layers.dropout({rate: 0.6}));
+  model.add(tf.layers.dropout({rate: DROP_OUT}));
   model.add(tf.layers.batchNormalization());
   model.add(tf.layers.activation({activation: 'relu'}));
   model.add(
@@ -96,8 +97,8 @@ const csvDataset = await tf.data.csv(DATA_URL, {
   });
 
   // step 3: train the model using our data
-  const BATCH_SIZE = 500; // was 500, down to 100 to try on mobile
-  const EPOCHS = 50; // was 500, down to 50 to make this train quickly
+  const BATCH_SIZE = 500;
+  const EPOCHS = 300;
   const DATA_SIZE = 1500;
 
   // this is broken, prefetch should deliver all values, but only delivers up tp 1000
