@@ -106,8 +106,7 @@ const DATA_URL =
 
   // step 3: train the model using our data
   const BATCH_SIZE = 500;
-  // const EPOCHS = 300;
-  const EPOCHS = 50;
+  const EPOCHS = 300;
   const DATA_SIZE = 1500;
 
   // this is broken, prefetch should deliver all values, but only delivers up tp 1000
