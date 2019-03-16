@@ -11,7 +11,7 @@ const calcBtn = document.querySelector('#calc-btn');
 let model = null;
 (async () => {
   model = await tf.loadLayersModel('indexeddb://insurance');
-  model.predict(tf.tensor([[48, 100, 10]])).print();
+  model.predict(tf.tensor([[100, 48, 10]])).print();
   calcBtn.disabled = null;
 })();
 
@@ -21,7 +21,7 @@ function clearButtons() {
 }
 
 async function calculate(speed, age, miles) {
-  const prediction = model.predict(tf.tensor([[age, speed, miles]]));
+  const prediction = model.predict(tf.tensor([[speed, age, miles]]));
   const value = await prediction.data();
   return value;
 }

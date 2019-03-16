@@ -4,20 +4,23 @@
 const DATA_URL =
   "https://raw.githubusercontent.com/DJCordhose/deep-learning-crash-course-notebooks/master/data/insurance-customers-1500.csv";
 
+// define model globally, so you can use it from the console later
+let model;
+
 (async () => {
   // step 1: load, plot and pre-process data
 
   // https://js.tensorflow.org/api/latest/#data.csv
-  const csvDataset = await tf.data.csv(DATA_URL, {
+  const data = await tf.data.csv(DATA_URL, {
     delimiter: ";",
     columnConfigs: {
       group: { isLabel: true }
     }
-  });
+  }).shuffle(1500).toArray();
 
   // https://js.tensorflow.org/api/latest/#class:data.CSVDataset
-  const columnNames = await csvDataset.columnNames();
-  console.log(columnNames);
+  // const columnNames = await csvDataset.columnNames();
+  // console.log(columnNames);
 
   // https://js.tensorflow.org/api/latest/#class:data.Dataset
   // 0 - red: many accidents
@@ -28,18 +31,16 @@ const DATA_URL =
   // https://github.com/tensorflow/tfjs-vis
   // https://js.tensorflow.org/api_vis/latest/#render.scatterplot
 
-  const valuesAgeSpeedRed = await csvDataset
+  const valuesAgeSpeedRed = data
     .filter(({ xs, ys }) => Number(ys.group) === red)
-    .map(({ xs, ys }) => ({ x: xs.age, y: xs.speed }))
-    .toArray();
-  const valuesAgeSpeedGreen = await csvDataset
+    .map(({ xs, ys }) => ({ x: xs.age, y: xs.speed }));
+  const valuesAgeSpeedGreen = data
     .filter(({ xs, ys }) => Number(ys.group) === green)
-    .map(({ xs, ys }) => ({ x: xs.age, y: xs.speed }))
-    .toArray();
-  const valuesAgeSpeedYellow = await csvDataset
+    .map(({ xs, ys }) => ({ x: xs.age, y: xs.speed }));
+  const valuesAgeSpeedYellow = data
     .filter(({ xs, ys }) => Number(ys.group) === yellow)
-    .map(({ xs, ys }) => ({ x: xs.age, y: xs.speed }))
-    .toArray();
+    .map(({ xs, ys }) => ({ x: xs.age, y: xs.speed }));
+
   const scatterContainer = document.getElementById("scatter-surface");
   tfvis.render.scatterplot(
     {
@@ -62,13 +63,13 @@ const DATA_URL =
   // https://js.tensorflow.org/api/latest/#layers.dropout
   // https://js.tensorflow.org/api/latest/#layers.batchNormalization
 
-  const DROP_OUT = 0.7;
+  const DROP_OUT = 0.8;
   const REGULARIZE = true;
-  const model = tf.sequential();
+  model = tf.sequential();
   model.add(
     tf.layers.dense({
       name: "hidden1",
-      units: 100,
+      units: 250,
       inputShape: [3]
     })
   );
@@ -80,7 +81,7 @@ const DATA_URL =
     model.add(tf.layers.dropout({ rate: DROP_OUT }));
   }
 
-  model.add(tf.layers.dense({ name: "hidden2", units: 100 }));
+  model.add(tf.layers.dense({ name: "hidden2", units: 250 }));
   if (REGULARIZE) {
     model.add(tf.layers.batchNormalization());
   }
@@ -105,20 +106,13 @@ const DATA_URL =
   });
 
   // step 3: train the model using our data
-  const BATCH_SIZE = 500;
-  const EPOCHS = 150;
-  const DATA_SIZE = 1500;
+  const xs = data
+    .map(({ xs, _ }) => Object.values(xs));
 
-  // this is broken, prefetch should deliver all values, but only delivers up tp 1000
-  const xs = await csvDataset
-    .prefetch(DATA_SIZE)
-    .map(({ xs, _ }) => Object.values(xs))
-    .toArray();
+  const ys = data
+    .map(({ _, ys }) => Object.values(ys)[0]);
 
-  const ys = await csvDataset
-    .prefetch(DATA_SIZE)
-    .map(({ _, ys }) => Object.values(ys)[0])
-    .toArray();
+  console.log('Number of datasets for fitting:', xs.length);  
 
   const X = tf.tensor2d(xs, [xs.length, 3]);
   // const y = tf.oneHot(tf.tensor1d(ys, 'int32'), 3);
@@ -138,12 +132,16 @@ const DATA_URL =
     }
   };
 
+  const BATCH_SIZE = 500;
+  const EPOCHS = 300;
+
   // https://js.tensorflow.org/api/latest/#tf.LayersModel.fitDataset
   // https://js.tensorflow.org/api/latest/#tf.LayersModel.fit
   const history = await model.fit(X, y, {
     epochs: EPOCHS,
     validationSplit: 0.2,
     batchSize: BATCH_SIZE,
+    shuffle: true,
     callbacks: vizCallbacks
     // callbacks: consoleCallbacks
   });
@@ -163,20 +161,20 @@ const DATA_URL =
   console.log(summary);
   const summaryContainer = document.getElementById("summary");
   summaryContainer.textContent = summary;
-  model.predict(tf.tensor([[48, 100, 10]])).print();
+  model.predict(tf.tensor([[100, 48, 10]])).print();
 
   // 0 - red: many accidents
   // 1 - green: few or no accidents
   // 2 - yellow: in the middle
   const classNames = ["many accidents", "few or no accidents", "in the middle"];
-  const labels = tf.tensor(ys);
-  const preds = model.predict(X).argMax([-1]);
+  const yTrue = tf.tensor(ys);
+  const yPred = model.predict(X).argMax([-1]);
 
-  const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds);
+  const confusionMatrix = await tfvis.metrics.confusionMatrix(yTrue, yPred);
   const matrixContainer = document.getElementById("matrix-surface");
   tfvis.show.confusionMatrix(matrixContainer, confusionMatrix, classNames);
 
-  const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds);
+  const classAccuracy = await tfvis.metrics.perClassAccuracy(yTrue, yPred);
   const accuracyContainer = document.getElementById("accuracy-surface");
   tfvis.show.perClassAccuracy(accuracyContainer, classAccuracy, classNames);
 
