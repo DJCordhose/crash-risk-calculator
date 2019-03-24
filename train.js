@@ -63,7 +63,7 @@ let model;
   // https://js.tensorflow.org/api/latest/#layers.dropout
   // https://js.tensorflow.org/api/latest/#layers.batchNormalization
 
-  const DROP_OUT = 0.8;
+  const DROP_OUT = 0.6;
   const REGULARIZE = true;
   model = tf.sequential();
   model.add(
@@ -73,20 +73,20 @@ let model;
       inputShape: [3]
     })
   );
-  if (REGULARIZE) {
-    model.add(tf.layers.batchNormalization());
-  }
+
+  // https://towardsdatascience.com/checklist-for-debugging-neural-networks-d8b2a9434f21
+  // https://stackoverflow.com/questions/39691902/ordering-of-batch-normalization-and-dropout
+  // https://arxiv.org/abs/1801.05134
   model.add(tf.layers.activation({ activation: "relu" }));
   if (REGULARIZE) {
+    model.add(tf.layers.batchNormalization());
     model.add(tf.layers.dropout({ rate: DROP_OUT }));
   }
 
   model.add(tf.layers.dense({ name: "hidden2", units: 250 }));
-  if (REGULARIZE) {
-    model.add(tf.layers.batchNormalization());
-  }
   model.add(tf.layers.activation({ activation: "relu" }));
   if (REGULARIZE) {
+    model.add(tf.layers.batchNormalization());
     model.add(tf.layers.dropout({ rate: DROP_OUT }));
   }
 
@@ -132,8 +132,8 @@ let model;
     }
   };
 
-  const BATCH_SIZE = 500;
-  const EPOCHS = 300;
+  const BATCH_SIZE = 200;
+  const EPOCHS = 50;
 
   // https://js.tensorflow.org/api/latest/#tf.LayersModel.fitDataset
   // https://js.tensorflow.org/api/latest/#tf.LayersModel.fit
